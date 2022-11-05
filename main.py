@@ -2,6 +2,11 @@ import docx
 from docx import Document
 from docx.shared import RGBColor
 import re
+from tkinter import *
+from tkinter import filedialog
+from tkinter import ttk
+from tkinter.messagebox import showinfo
+import os
 import xlwings
 
 # DER and TBV are not valid tags
@@ -31,7 +36,8 @@ for tag in parentTagList:
 uniqueTagList = (list(set(uniqueValidTagList)))     # set() strips out all redundant tags
 
 
-filePath = "C:/Users/steph/OneDrive/Desktop/Docs_Project/"
+#filePath = "C:/Users/steph/OneDrive/Desktop/Docs_Project/"
+filePath = "/Users/adrian/Desktop/SampledocsTandem/"
 
 def GetText(filename):                      # Opens the document and places each paragraph into a list
     doc = docx.Document(filename)
@@ -154,4 +160,105 @@ GetChildTags()
 
 report3.save('report3.docx')
 GetOrphanTags()
+
+window = Tk()
+window.title('Targest')
+window.iconbitmap("/Users/") # mac path
+# window.iconbitmap("C:/Users/") # windows path
+
+#columns = ('Parent Tag', 'Info', 'Child Tag')
+strWindow = StringVar()
+pathLabel = Label(window, textvariable=strWindow, fg='blue')
+# pathLabel.grid(row=3, column=1)
+# strWindow.set("Directory Path")
+treeView = ttk.Treeview(window, selectmode='browse')
+# treeView.grid(row=3, column=1, columnspan=4, padx=20, pady=20)
+treeView['show'] = 'tree'
+
+def saveFile():
+    file = filedialog.asksaveasfilename(initialdir="/Users/adrian/",
+                                        filetypes=[("Text files", '*.txt'), ("Word document", ".docx"), ("CSV files", '.csv'), ("All file types", "*.*")],
+                                        defaultextension='.txt', title="Save file")
+    fileObject = open(file, 'w')
+    #      if file is None:
+    #         return
+    # #     # name = file.name
+    # #     # baseName = os.path.basename(name)
+    # #     # path = os.path.dirname(name)
+    # #     # print(path)
+    # #     # print(baseName)
+    # #     # doc.save(path + "/" + baseName)
+    #      fileText = str(text.get(1.0,END))
+    # #     #fileText = input()
+    fileObject.write("hi")
+    #file.write(fileText)
+    fileObject.close()
+
+def loadFile():
+    file = filedialog.askopenfilename(initialdir="/Users/adrian/", # for this to work just change to your directory path
+                                      filetypes=[
+                                          ("Word document", "*.docx"),
+                                          ("CSV files", '.csv'),
+                                          ("Text files", '*.txt'),
+                                          ("All file types", "*.*")
+                                      ])
+    if(file):
+        strWindow.set(file)
+        file = open(file, 'r') # this can work for string objects if you change "askopenfile" to "askopenfilename"
+        #print(file.read()) # change from 'file' to 'fileObject' for "askopenfilename" implementation method to work
+        i = 0
+        for data in file:
+            treeView.insert("", 'end', iid=i, text=data)
+            i = i + 1
+
+# def doNothing():
+#     fileWin = Toplevel(window)
+#     button = Button(fileWin, text="Do nothing button")
+#     button.pack()
+
+# def newFile():
+#     myText.delete("1.0", END)
+#     window.title('Targest')
+#     statusBar.config(text="New File   ")
+#
+
+# textScroll.config(command=myText.yview)
+text = Text(window, borderwidth=10, background='light grey')
+text.pack()
+#
+# menuBar = Menu(window)
+# fileMenu = Menu(menuBar, tearoff=0)
+# fileMenu.add_command(label="New", command=doNothing)
+# fileMenu.add_command(label="Open", command=doNothing)
+# #fileMenu.add_command(label="Save", command=saveFile)
+# fileMenu.add_command(label="Save as...", command=doNothing)
+# fileMenu.add_command(label="Close", command=doNothing)
+#
+# fileMenu.add_separator()
+#
+# fileMenu.add_command(label="Exit", command=window.quit)
+# menuBar.add_cascade(label="File", menu=fileMenu)
+# editMenu = Menu(menuBar, tearoff=0)
+# editMenu.add_command(label="Undo", command=doNothing)
+#
+# editMenu.add_separator()
+#
+# editMenu.add_command(label="Cut", command=doNothing)
+# editMenu.add_command(label="Copy", command=doNothing)
+# editMenu.add_command(label="Paste", command=doNothing)
+# editMenu.add_command(label="Delete", command=doNothing)
+# editMenu.add_command(label="Select All", command=doNothing)
+#
+# menuBar.add_cascade(label="Edit", menu=editMenu)
+# helpMenu = Menu(menuBar, tearoff=0)
+# helpMenu.add_command(label="Help Index", command=doNothing)
+# helpMenu.add_command(label="About...", command=doNothing)
+# menuBar.add_cascade(label="Help", menu=helpMenu)
+#
+# window.config(menu=menuBar)
+saveButton = Button(window, text='Save', fg='blue', activeforeground='red', width=20, command=saveFile)
+loadButton = Button(window, text='Load', fg='blue', activeforeground='red', width=20, command=loadFile)
+saveButton.pack(side=LEFT, padx=15, pady=20)
+loadButton.pack(side=BOTTOM, padx=15, pady=20)
+window.mainloop()
 
